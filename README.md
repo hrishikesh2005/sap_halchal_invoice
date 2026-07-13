@@ -29,20 +29,9 @@ HTTPS Sender
 | **Extract Order Properties** | Content Modifier | Extracts order, customer, delivery, line-item, GST, and payment fields into message properties |
 | **Build Invoice HTML** | Content Modifier | Constructs a styled XHTML invoice from the extracted properties |
 | **Generate PDF Invoice** | Groovy Script | Renders the HTML to a PDF using OpenHTMLToPDF + Apache PDFBox, and attaches it to the message |
-| **Send Invoice** | Mail Adapter | Emails the invoice (PDF attached) to the customer and the business owner via Gmail SMTP |
+| **Send Invoice** | Mail Adapter | Emails the invoice (PDF attached) to the customer via Gmail SMTP |
 
----
 
-## Tech Stack
-
-- **SAP Integration Suite** — Cloud Integration (CPI)
-- **Groovy** — payload parsing, PDF generation, attachment handling
-- **OpenHTMLToPDF + Apache PDFBox** — HTML-to-PDF rendering (Apache 2.0 / LGPL licensed)
-- **XPath** — field extraction from XML
-- **Mail Adapter (SMTP)** — Gmail-based email delivery
-- **Node.js** — source e-commerce platform (webhook sender)
-
----
 
 ## Sample Order Payload
 
@@ -64,7 +53,7 @@ HTTPS Sender
 ## Prerequisites (to deploy this iFlow)
 
 ### 1. Required JAR libraries
-The PDF generation depends on the following libraries, added as **iFlow Archive resources** (not included in this repo):
+The PDF generation depends on the following libraries
 
 | Library | Version |
 |---------|---------|
@@ -76,8 +65,6 @@ The PDF generation depends on the following libraries, added as **iFlow Archive 
 | commons-io | 2.11.0 |
 | graphics2d | 0.32 |
 
-Download from Maven Central and upload via the iFlow **References → Archives** section.
-
 ### 2. Security Material
 A **User Credentials** artifact named `GmailSMTP` (Gmail address + a Gmail **App Password**, with 2-Factor Authentication enabled on the account).
 
@@ -86,17 +73,6 @@ An SAP Process Integration Runtime instance (Cloud Foundry) with a service key p
 
 ---
 
-## Key Design Decisions
+<img width="1551" height="460" alt="image" src="https://github.com/user-attachments/assets/a88466a1-d57f-455f-9fc9-a23052209f62" />
 
-**Why generate the PDF inside CPI?**  
-This project generates the PDF within CPI (via bundled Java libraries) to demonstrate external-library integration and binary/attachment handling in the Groovy runtime. In a production enterprise landscape, PDF generation would more typically live in the source application or a dedicated service such as **SAP Forms Service by Adobe**, with CPI handling integration and routing.
 
-**Why OpenHTMLToPDF over iText?**  
-OpenHTMLToPDF (LGPL) and Apache PDFBox (Apache 2.0) are commercially safe, whereas iText is AGPL-licensed. OpenHTMLToPDF also provides a modern CSS renderer for cleaner invoice styling.
-
-**Fault tolerance**  
-The PDF generation step wraps rendering in error handling so malformed input fails cleanly rather than corrupting the flow.
-
----
-
-## Author
